@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { Toaster } from "sonner";
-import { AdminLogin } from "./components/AdminLogin.tsx";
-import { MasterDashboardApple } from "./components/MasterDashboardApple.tsx";
-import { SalonRegister } from "./components/SalonRegister.tsx";
-import { SalonLogin } from "./components/SalonLogin.tsx";
-import { SalonDashboard } from "./components/SalonDashboard.tsx";
-import { PublicBookingFlowHybrid } from "./components/PublicBookingFlowHybrid.tsx";
-import { LinearLandingPage } from "./components/LinearLandingPage.tsx";
-import { PaymentPending } from "./components/PaymentPending.tsx";
-import { PaymentScreen } from "./components/PaymentScreen.tsx";
-import { PWAInstallPrompt } from "./components/PWAInstallPrompt.tsx";
-import { UpgradeScreen } from "./components/UpgradeScreen.tsx";
-import { WhatsAppButton } from "./components/WhatsAppButton.tsx";
+import { AdminLogin } from "./components/AdminLogin";
+import { MasterDashboardApple } from "./components/MasterDashboardApple";
+import { SalonRegister } from "./components/SalonRegister";
+import { SalonLogin } from "./components/SalonLogin";
+import { SalonDashboard } from "./components/SalonDashboard";
+import { PublicBookingFlowHybrid } from "./components/PublicBookingFlowHybrid";
+import { LinearLandingPage } from "./components/LinearLandingPage";
+import { PaymentPending } from "./components/PaymentPending";
+import { PaymentScreen } from "./components/PaymentScreen";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
+import { UpgradeScreen } from "./components/UpgradeScreen";
+import { WhatsAppButton } from "./components/WhatsAppButton";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<string>("landing");
