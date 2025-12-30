@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="format-detection" content="date=no" />
+    <meta name="format-detection" content="address=no" />
+    <meta name="format-detection" content="email=no" />
+    <meta name="description" content="BEST SUA AGENDA - Sistema completo de agendamento online para salões de beleza. Gerencie agendamentos 24/7 pelo celular." />
+    <meta name="theme-color" content="#2D005E" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="BEST SUA AGENDA" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Best Sua Agenda" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/icons/icon-192x192.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "21f248be-9403-4421-9448-e06014aa3f89",
+        });
+      });
+    </script>
+    <title>BEST SUA AGENDA - Sistema Premium para Salões de Beleza</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/app/App.tsx"></script>
+  </body>
+</html>
