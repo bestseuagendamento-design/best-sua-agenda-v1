@@ -1,18 +1,17 @@
 import { useState, useEffect } from "react";
 import { Toaster } from "sonner";
-import { AdminLogin } from "./components/AdminLogin";
-import { AdminDashboard } from "./components/AdminDashboard";
-import { MasterDashboardV2 } from "./components/MasterDashboardV2";
-import { SalonRegister } from "./components/SalonRegister";
-import { SalonLogin } from "./components/SalonLogin";
-import { SalonDashboard } from "./components/SalonDashboard";
-import { PublicBookingFlowHybrid } from "./components/PublicBookingFlowHybrid";
-import { LinearLandingPage } from "./components/LinearLandingPage";
-import { PaymentPending } from "./components/PaymentPending";
-import { PaymentScreen } from "./components/PaymentScreen";
-import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
-import { UpgradeScreen } from "./components/UpgradeScreen";
-import { WhatsAppButton } from "./components/WhatsAppButton";
+import { AdminLogin } from "./components/AdminLogin.tsx";
+import { MasterDashboardApple } from "./components/MasterDashboardApple.tsx";
+import { SalonRegister } from "./components/SalonRegister.tsx";
+import { SalonLogin } from "./components/SalonLogin.tsx";
+import { SalonDashboard } from "./components/SalonDashboard.tsx";
+import { PublicBookingFlowHybrid } from "./components/PublicBookingFlowHybrid.tsx";
+import { LinearLandingPage } from "./components/LinearLandingPage.tsx";
+import { PaymentPending } from "./components/PaymentPending.tsx";
+import { PaymentScreen } from "./components/PaymentScreen.tsx";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt.tsx";
+import { UpgradeScreen } from "./components/UpgradeScreen.tsx";
+import { WhatsAppButton } from "./components/WhatsAppButton.tsx";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<string>("landing");
@@ -97,37 +96,55 @@ export default function App() {
       {currentPage === "landing" && (
         <LinearLandingPage onNavigate={navigate} />
       )}
+      
       {currentPage === "admin-login" && (
         <AdminLogin 
           onLogin={(adminData) => navigate("admin-dashboard", { admin: adminData })} 
           onBack={() => navigate("landing")}
         />
       )}
+      
       {currentPage === "admin-dashboard" && admin && (
-        <MasterDashboardV2 
+        <MasterDashboardApple 
           onLogout={handleLogout}
         />
       )}
+      
       {currentPage === "salon-register" && (
         <SalonRegister 
           selectedPlan={selectedPlan}
           onGoToLogin={() => navigate("salon-login")}
           onRegister={(salonData) => {
+            console.log("🎯 SalonRegister - Salão cadastrado:", salonData);
+            console.log("📦 Plano selecionado:", selectedPlan);
+            
+            // 🎄 VERIFICAR SE TEM PROMOÇÃO DE NATAL (vem do salonData.selectedPlan)
             if (salonData.selectedPlan) {
+              console.log("🎄 PROMOÇÃO DE NATAL DETECTADA! Redirecionando para PaymentScreen...");
               setSalon(salonData);
               setSelectedPlan(salonData.selectedPlan);
               navigate("payment-screen", { plan: salonData.selectedPlan, salon: salonData });
               return;
             }
+            
+            // LÓGICA CORRETA DO FLUXO:
+            
+            // 1. Se tem plano PAGO selecionado → Vai para PaymentScreen
             if (selectedPlan && selectedPlan.id !== "free-trial") {
-              setSalon(salonData);
+              console.log("💰 PLANO PAGO - Redirecionando para PaymentScreen...");
+              setSalon(salonData); // Salva os dados do salão
               navigate("payment-screen", { plan: selectedPlan, salon: salonData });
               return;
             }
+            
+            // 2. Se é TESTE GRATUITO → Vai direto para Dashboard
             if (!selectedPlan || selectedPlan.id === "free-trial") {
+              console.log("🎁 TESTE GRATUITO - Liberando acesso imediato...");
               navigate("salon-dashboard", { salon: salonData });
               return;
             }
+            
+            // 3. Fallback: verifica status do servidor
             if (salonData.status === "pending_payment" || salonData.subscription?.paymentStatus === "pending_first_payment") {
               navigate("payment-pending", { salon: salonData });
             } else {
@@ -135,36 +152,65 @@ export default function App() {
             }
           }}
           onBack={() => {
-            setSelectedPlan(null);
+            setSelectedPlan(null); // Limpa o plano selecionado
             navigate("landing");
           }}
         />
       )}
+      
       {currentPage === "salon-login" && (
         <SalonLogin 
           onLogin={(salonData, needsPayment) => {
+            console.log("🎯 App.tsx - Dados recebidos do login:", {
+              status: salonData.status,
+              paymentStatus: salonData.subscription?.paymentStatus,
+              name: salonData.name,
+              needsPayment
+            });
+            
+            // 🎯 NOVO: Verifica se está bloqueado e mostra UpgradeScreen
             if (salonData.status === "blocked") {
               setSalon(salonData);
+              
               if (salonData.blockReason === "trial_expired") {
                 setUpgradeReason("trial_expired");
                 navigate("upgrade-screen");
                 return;
               }
+              
               if (salonData.blockReason === "payment_overdue") {
                 setUpgradeReason("payment_overdue");
                 navigate("upgrade-screen");
                 return;
               }
             }
+            
+            // Check if needs payment (first registration with pending_payment status)
             if (needsPayment) {
+              console.log("⚠️ Precisa completar pagamento, redirecionando...");
               navigate("payment-pending", { salon: salonData });
               return;
             }
-            navigate("salon-dashboard", { salon: salonData });
+            
+            // 🚀 SE A API RETORNOU SUCESSO, É PORQUE ESTÁ TUDO OK!
+            // A validação já foi feita no servidor (status === "active" && paymentStatus === "paid")
+            // LIBERA ACESSO IMEDIATAMENTE!
+            
+            // Apenas verifica pending_renewal (já está ativo mas precisa renovar em breve)
+            if (salonData.subscription?.paymentStatus === "pending_renewal") {
+              console.log("⚠️ Pagamento vencido, mas ainda permite acesso");
+              // Ainda permite acesso, mas mostra aviso
+              navigate("salon-dashboard", { salon: salonData });
+            } else {
+              // ✅ TUDO CERTO - LIBERA DASHBOARD IMEDIATAMENTE!
+              console.log("✅✅✅ LIBERANDO DASHBOARD IMEDIATAMENTE!");
+              navigate("salon-dashboard", { salon: salonData });
+            }
           }}
           onBack={() => navigate("landing")}
         />
       )}
+      
       {currentPage === "upgrade-screen" && salon && upgradeReason && (
         <UpgradeScreen 
           salon={salon}
@@ -172,6 +218,7 @@ export default function App() {
           onClose={() => navigate("landing")}
         />
       )}
+      
       {currentPage === "salon-dashboard" && salon && (
         <SalonDashboard 
           salon={salon}
@@ -180,32 +227,39 @@ export default function App() {
             navigate("landing");
           }}
           onSelectPlan={(plan) => {
+            console.log("💳 App.tsx - Plano selecionado do dashboard:", plan);
             setSelectedPlan(plan);
             navigate("payment-screen", { plan, salon });
           }}
         />
       )}
+      
       {currentPage === "payment-pending" && salon && (
         <PaymentPending 
           salon={salon}
           onPaymentSubmitted={() => navigate("landing")}
         />
       )}
+      
       {currentPage === "payment-screen" && selectedPlan && (
         <PaymentScreen 
           plan={selectedPlan}
           salon={salon}
           onBack={() => navigate("landing")}
           onPaymentConfirmed={() => {
+            // Após pagamento confirmado, redireciona para registro
             navigate("salon-register");
           }}
         />
       )}
+      
       {currentPage === "booking" && salonSlug && (
         <PublicBookingFlowHybrid slug={salonSlug} onBack={() => navigate("landing")} />
       )}
       <Toaster />
       <PWAInstallPrompt />
+      
+      {/* WhatsApp flutuante APENAS na landing page */}
       {currentPage === "landing" && <WhatsAppButton variant="floating" />}
     </div>
   );
